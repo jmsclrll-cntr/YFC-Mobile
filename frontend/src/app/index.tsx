@@ -70,6 +70,25 @@ export default function DashboardScreen() {
           </View>
         </View>
 
+        {/* Quick Actions Scroll */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.actionScroll}>
+          {[
+            { label: 'Upcoming Activities', route: '/events' },
+            { label: 'Announcements', route: '/announcements' },
+            { label: 'Notifications', route: '/notifications' },
+            { label: 'Quick Attendance', route: '/attendance' },
+            { label: 'Member Information', route: '/profile' }
+          ].map((btn) => (
+            <TouchableOpacity 
+              key={btn.label} 
+              style={styles.actionChip}
+              onPress={() => router.push(btn.route as any)}
+            >
+              <Text style={styles.actionChipText}>{btn.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
         {/* Hero Featured Glass Card - YFC National Youth Summit */}
         <View style={styles.heroCard}>
           <BlurView intensity={55} tint="light" style={StyleSheet.absoluteFill} />
@@ -323,6 +342,23 @@ const styles = StyleSheet.create({
     right: 8,
     borderWidth: 1,
     borderColor: '#3d991a',
+  },
+  actionScroll: {
+    marginBottom: 24,
+  },
+  actionChip: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+    marginRight: 10,
+  },
+  actionChipText: {
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontWeight: '600',
+    fontSize: 14,
   },
   heroCard: {
     borderRadius: 24,

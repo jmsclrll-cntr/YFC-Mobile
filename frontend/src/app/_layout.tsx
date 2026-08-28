@@ -67,6 +67,24 @@ function TabLayoutInner() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="announcements"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="attendance"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
