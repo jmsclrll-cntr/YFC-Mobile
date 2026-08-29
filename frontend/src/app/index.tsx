@@ -19,7 +19,7 @@ import { HelpTab } from '@/components/dashboard/HelpTab';
 const { width, height } = Dimensions.get('window');
 
 const TABS = [
-  'Dashboard', 'Area', 'Members', 'Activities', 'Formations', 
+  'Dashboard', 'Area', 'Members', 'Activities', 'Formations',
   'Evangelization', 'Reports', 'ACS/ID', 'Help'
 ];
 
@@ -91,8 +91,8 @@ export default function DashboardScreen() {
           {TABS.map((tab) => {
             const isActive = activeTab === tab;
             return (
-              <TouchableOpacity 
-                key={tab} 
+              <TouchableOpacity
+                key={tab}
                 style={[styles.tabChip, isActive && styles.tabChipActive]}
                 onPress={() => setActiveTab(tab)}
               >
