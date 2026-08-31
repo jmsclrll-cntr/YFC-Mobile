@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useFonts, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import GlassIcon from '@/components/glass-icon';
 import { useAuth } from '@/context/auth-context';
+import { supabase } from '@/lib/supabase';
 import { UiColors, UiShadow } from '@/constants/ui';
 
 const SLIDESHOW_IMAGES = [
@@ -66,16 +67,49 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const [fontsLoaded] = useFonts({ Oswald_700Bold });
 
-  const handleLogin = () => {
-    if (username.trim() === '' && password === '') {
-      setErrorMessage('');
-      login();
-      router.replace('/');
-    } else {
+  const handleLogin = async () => {
+    const trimmedUsername = username.trim();
+
+    if (!trimmedUsername || !password) {
+      setErrorMessage('Please enter your username and password.');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      const { data, error } = await supabase.rpc('verify_login', {
+        p_username: trimmedUsername,
+        p_password: password,
+      });
+
+      if (error) {
+        if (__DEV__) {
+          console.error('Supabase login error:', error.message, error.code, error.details);
+        }
+        setErrorMessage('Unable to sign in right now. Please try again.');
+        return;
+      }
+
+      if (data === true) {
+        login();
+        router.replace('/');
+        return;
+      }
+
       setErrorMessage('Invalid username or password. Please try again.');
+    } catch (err) {
+      if (__DEV__) {
+        console.error('Login request failed:', err);
+      }
+      setErrorMessage('Unable to sign in right now. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -169,12 +203,15 @@ export default function LoginScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="h-[52px] flex-row items-center justify-center gap-[8px] rounded-[16px] bg-[#3D991A]"
+                className={`h-[52px] flex-row items-center justify-center gap-[8px] rounded-[16px] bg-[#3D991A] ${isLoading ? 'opacity-70' : ''}`}
                 style={UiShadow.card}
                 onPress={handleLogin}
+                disabled={isLoading}
               >
-                <Text className="text-[15px] font-semibold tracking-[0.3px] text-white">Sign In</Text>
-                <GlassIcon name="chevron-right" size={18} color="#ffffff" />
+                <Text className="text-[15px] font-semibold tracking-[0.3px] text-white">
+                  {isLoading ? 'Signing In...' : 'Sign In'}
+                </Text>
+                {!isLoading ? <GlassIcon name="chevron-right" size={18} color="#ffffff" /> : null}
               </TouchableOpacity>
             </View>
           </View>
