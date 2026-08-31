@@ -1,49 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import VibrantBackground from '@/components/vibrant-background';
 import GlassCard from '@/components/glass-card';
 
 export default function AnnouncementsScreen() {
   return (
     <VibrantBackground>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Announcements</Text>
-          <Text style={styles.subtitle}>Latest updates from YFC</Text>
+      <ScrollView
+        contentContainerClassName="px-[20px] pt-[60px] pb-[110px]"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="mb-[24px]">
+          <Text className="text-[32px] font-semibold tracking-[-0.5px] text-[#1C1C1E]">Announcements</Text>
+          <Text className="mt-[6px] text-[15px] text-[#8E8E93]">Latest updates from YFC</Text>
         </View>
-        <GlassCard style={styles.card} glowColor="rgba(139, 92, 246, 0.25)">
-          <Text style={styles.cardText}>No new announcements at this time.</Text>
+        <GlassCard>
+          <Text className="text-[16px] text-[#8E8E93]">No new announcements at this time.</Text>
         </GlassCard>
       </ScrollView>
     </VibrantBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 110,
-  },
-  header: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginTop: 4,
-  },
-  card: {
-    padding: 20,
-  },
-  cardText: {
-    color: '#ffffff',
-    fontSize: 16,
-  },
-});

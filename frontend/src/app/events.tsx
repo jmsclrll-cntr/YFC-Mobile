@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import VibrantBackground from '@/components/vibrant-background';
 import GlassCard from '@/components/glass-card';
 import GlassIcon from '@/components/glass-icon';
@@ -40,68 +40,84 @@ const EVENTS = [
   },
 ];
 
+const FILTER_CHIP_BASE = 'mr-[10px] rounded-[20px] border px-[18px] py-[10px]';
+const FILTER_CHIP_IDLE = `${FILTER_CHIP_BASE} border-[#E5E5EA] bg-white`;
+const FILTER_CHIP_ACTIVE = `${FILTER_CHIP_BASE} border-[rgba(61,153,26,0.25)] bg-[#E8F5E3]`;
+
 export default function EventsScreen() {
   const [activeTab, setActiveTab] = useState('All');
 
   return (
     <VibrantBackground>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>YFC Events</Text>
-          <Text style={styles.subtitle}>Discover upcoming gatherings & worship nights</Text>
+      <ScrollView
+        contentContainerClassName="px-[20px] pt-[60px] pb-[110px]"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="mb-[24px]">
+          <Text className="text-[32px] font-semibold tracking-[-0.5px] text-[#1C1C1E]">YFC Events</Text>
+          <Text className="mt-[6px] text-[15px] text-[#8E8E93]">
+            Discover upcoming gatherings & worship nights
+          </Text>
         </View>
 
-        {/* Category Filters */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-[24px]">
           {['All', 'Worship', 'Conference', 'Outreach', 'Workshops'].map((cat) => (
             <TouchableOpacity
               key={cat}
               onPress={() => setActiveTab(cat)}
-              style={[styles.filterChip, activeTab === cat && styles.filterChipActive]}
+              className={activeTab === cat ? FILTER_CHIP_ACTIVE : FILTER_CHIP_IDLE}
             >
-              <Text style={[styles.filterChipText, activeTab === cat && styles.filterChipTextActive]}>{cat}</Text>
+              <Text
+                className={
+                  activeTab === cat
+                    ? 'text-[14px] font-semibold text-[#3D991A]'
+                    : 'text-[14px] font-medium text-[#8E8E93]'
+                }
+              >
+                {cat}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        {/* Events List */}
-        <View style={styles.eventsList}>
+        <View className="gap-[16px]">
           {EVENTS.filter((e) => activeTab === 'All' || e.category === activeTab).map((event) => (
-            <GlassCard key={event.id} style={styles.eventCard} glowColor="rgba(139, 92, 246, 0.25)">
-              <View style={styles.cardHeader}>
-                <View style={styles.tagBadge}>
-                  <Text style={styles.tagText}>{event.tag}</Text>
+            <GlassCard key={event.id} style={{ marginBottom: 4 }}>
+              <View className="mb-[12px] flex-row items-center justify-between">
+                <View className="rounded-[10px] border border-[rgba(61,153,26,0.2)] bg-[#E8F5E3] px-[12px] py-[4px]">
+                  <Text className="text-[12px] font-semibold text-[#3D991A]">{event.tag}</Text>
                 </View>
-                <Text style={styles.categoryText}>{event.category}</Text>
+                <Text className="text-[13px] font-medium text-[#8E8E93]">{event.category}</Text>
               </View>
 
-              <Text style={styles.eventTitle}>{event.title}</Text>
-              <Text style={styles.eventDescription}>{event.description}</Text>
+              <Text className="mb-[8px] text-[20px] font-semibold tracking-[-0.3px] text-[#1C1C1E]">{event.title}</Text>
+              <Text className="mb-[16px] text-[14px] leading-[22px] text-[#8E8E93]">
+                {event.description}
+              </Text>
 
-              <View style={styles.metaRow}>
-                <GlassIcon name="calendar" size={15} color="#ec4899" />
-                <Text style={styles.metaText}>{event.date}</Text>
+              <View className="mb-[6px] flex-row items-center gap-[8px]">
+                <GlassIcon name="calendar" size={15} color="#3D991A" />
+                <Text className="text-[13px] font-medium text-[#1C1C1E]">{event.date}</Text>
               </View>
 
-              <View style={styles.metaRow}>
-                <GlassIcon name="clock" size={15} color="#06b6d4" />
-                <Text style={styles.metaText}>{event.time}</Text>
+              <View className="mb-[6px] flex-row items-center gap-[8px]">
+                <GlassIcon name="clock" size={15} color="#8E8E93" />
+                <Text className="text-[13px] font-medium text-[#8E8E93]">{event.time}</Text>
               </View>
 
-              <View style={styles.metaRow}>
-                <GlassIcon name="location" size={15} color="#a855f7" />
-                <Text style={styles.metaText}>{event.location}</Text>
+              <View className="mb-[6px] flex-row items-center gap-[8px]">
+                <GlassIcon name="location" size={15} color="#8E8E93" />
+                <Text className="text-[13px] font-medium text-[#8E8E93]">{event.location}</Text>
               </View>
 
-              <View style={styles.cardFooter}>
-                <View style={styles.attendeesRow}>
-                  <GlassIcon name="people" size={14} color="rgba(255,255,255,0.7)" />
-                  <Text style={styles.attendeesText}>{event.attendees} Going</Text>
+              <View className="mt-[16px] flex-row items-center justify-between border-t border-t-[#F0F0F0] pt-[14px]">
+                <View className="flex-row items-center gap-[6px]">
+                  <GlassIcon name="people" size={14} color="#8E8E93" />
+                  <Text className="text-[13px] text-[#8E8E93]">{event.attendees} Going</Text>
                 </View>
 
-                <TouchableOpacity style={styles.rsvpButton}>
-                  <Text style={styles.rsvpText}>Register Now</Text>
+                <TouchableOpacity className="rounded-[14px] bg-[#3D991A] px-[18px] py-[10px]">
+                  <Text className="text-[13px] font-semibold text-white">Register Now</Text>
                 </TouchableOpacity>
               </View>
             </GlassCard>
@@ -111,134 +127,3 @@ export default function EventsScreen() {
     </VibrantBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 110,
-  },
-  header: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginTop: 4,
-  },
-  filterScroll: {
-    marginBottom: 20,
-  },
-  filterChip: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.18)',
-    marginRight: 10,
-  },
-  filterChipActive: {
-    backgroundColor: 'rgba(139, 92, 246, 0.4)',
-    borderColor: 'rgba(168, 85, 247, 0.6)',
-  },
-  filterChipText: {
-    color: 'rgba(255, 255, 255, 0.75)',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  filterChipTextActive: {
-    color: '#ffffff',
-    fontWeight: '700',
-  },
-  eventsList: {
-    gap: 18,
-  },
-  eventCard: {
-    marginBottom: 4,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  tagBadge: {
-    backgroundColor: 'rgba(236, 72, 153, 0.25)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.4)',
-  },
-  tagText: {
-    color: '#f472b6',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  categoryText: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  eventTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 8,
-  },
-  eventDescription: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.75)',
-    lineHeight: 20,
-    marginBottom: 14,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  metaText: {
-    color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  attendeesRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  attendeesText: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: 13,
-  },
-  rsvpButton: {
-    backgroundColor: 'rgba(139, 92, 246, 0.6)',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  rsvpText: {
-    color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 13,
-  },
-});

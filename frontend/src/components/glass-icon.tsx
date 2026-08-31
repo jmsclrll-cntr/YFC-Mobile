@@ -56,7 +56,7 @@ interface GlassIconProps {
   weight?: SymbolWeight;
 }
 
-export default function GlassIcon({ name, size = 20, color = '#ffffff', weight = 'regular' }: GlassIconProps) {
+export default function GlassIcon({ name, size = 20, color = '#1C1C1E', weight = 'regular' }: GlassIconProps) {
   const iconConfig = SYMBOL_MAP[name] || SYMBOL_MAP.home;
 
   try {

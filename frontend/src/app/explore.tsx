@@ -33,10 +33,13 @@ export default function TabTwoScreen() {
   });
 
   return (
+    // ThemedView/ThemedText and expo-image have no className support, so they keep `style`
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
+      className="flex-1"
+      style={{ backgroundColor: theme.background }}
       contentInset={insets}
-      contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
+      contentContainerClassName="flex-row justify-center"
+      contentContainerStyle={contentPlatformStyle}>
       <ThemedView style={styles.container}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="subtitle">Explore</ThemedText>
@@ -126,13 +129,6 @@ export default function TabTwoScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
   container: {
     maxWidth: MaxContentWidth,
     flexGrow: 1,

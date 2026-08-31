@@ -1,23 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // NOTE: Update this to include the paths to all of your component files.
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
-        glass: {
-          light: "rgba(255, 255, 255, 0.15)",
-          border: "rgba(255, 255, 255, 0.25)",
-          dark: "rgba(15, 23, 42, 0.45)",
-          accent: "rgba(139, 92, 246, 0.25)",
+        ui: {
+          bg: '#F2F2F7',
+          surface: '#FFFFFF',
+          border: '#E5E5EA',
+          text: '#1C1C1E',
+          muted: '#8E8E93',
+          accent: '#3D991A',
+          'accent-light': '#E8F5E3',
         },
-        yfc: {
-          purple: "#7c3aed",
-          pink: "#ec4899",
-          cyan: "#06b6d4",
-          violet: "#8b5cf6",
-          dark: "#0b0914",
-        }
       },
     },
   },

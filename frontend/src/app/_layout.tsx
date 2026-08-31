@@ -1,9 +1,9 @@
 import React from 'react';
 import { Tabs, usePathname } from 'expo-router';
 import { StyleSheet, Platform, View } from 'react-native';
-import { BlurView } from 'expo-blur';
 import GlassIcon from '@/components/glass-icon';
 import { AuthProvider } from '@/context/auth-context';
+import { UiColors } from '@/constants/ui';
 
 function TabLayoutInner() {
   const pathname = usePathname();
@@ -14,16 +14,11 @@ function TabLayoutInner() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarActiveTintColor: '#c084fc',
-        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.55)',
+        tabBarActiveTintColor: UiColors.accent,
+        tabBarInactiveTintColor: UiColors.textSecondary,
         tabBarLabelStyle: styles.labelStyle,
         tabBarStyle: isLoginPage ? { display: 'none' } : styles.tabBar,
-        tabBarBackground: () => (
-          <View style={StyleSheet.absoluteFill}>
-            <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
-            <View style={styles.tabShine} />
-          </View>
-        ),
+        tabBarBackground: () => <View style={styles.tabBarBackground} />,
       }}
     >
       <Tabs.Screen
@@ -100,35 +95,32 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 24 : 16,
-    left: 20,
-    right: 20,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
-    backgroundColor: Platform.OS === 'web' ? 'rgba(15, 23, 42, 0.65)' : 'rgba(15, 23, 42, 0.35)',
-    paddingBottom: 6,
-    paddingTop: 6,
+    bottom: Platform.OS === 'ios' ? 28 : 20,
+    left: 28,
+    right: 28,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: StyleSheet.hairlineWidth + 0.5,
+    borderColor: UiColors.border,
+    backgroundColor: UiColors.surface,
+    paddingBottom: 4,
+    paddingTop: 4,
     overflow: 'hidden',
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.35,
-    shadowRadius: 24,
-    elevation: 12,
-    // @ts-ignore Web specific backdrop filter
-    ...(Platform.OS === 'web' ? { backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' } : {}),
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  tabBarBackground: {
+    flex: 1,
+    backgroundColor: UiColors.surface,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: UiColors.borderLight,
   },
   labelStyle: {
     fontSize: 11,
     fontWeight: '600',
     marginTop: 2,
-  },
-  tabShine: {
-    height: 1,
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
-    position: 'absolute',
-    top: 0,
   },
 });

@@ -1,39 +1,35 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { UiColors } from '@/constants/ui';
 
 const { width, height } = Dimensions.get('window');
 
 export default function VibrantBackground({ children }: { children?: React.ReactNode }) {
   return (
     <View style={styles.container}>
-      {/* Base Deep Vibrant Dark Canvas */}
       <LinearGradient
-        colors={['#0a0814', '#150d2a', '#0d182e', '#090712']}
+        colors={['#FAFAFA', UiColors.background, '#F5F9F3', UiColors.background]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Vibrant Mesh Blob 1 - Top Left Purple Glowing Sphere */}
       <LinearGradient
-        colors={['rgba(139, 92, 246, 0.45)', 'rgba(168, 85, 247, 0.15)', 'transparent']}
+        colors={['rgba(61, 153, 26, 0.06)', 'rgba(61, 153, 26, 0.02)', 'transparent']}
         style={[styles.blob, styles.blobTopLeft]}
       />
 
-      {/* Vibrant Mesh Blob 2 - Center Right Pink Glowing Sphere */}
       <LinearGradient
-        colors={['rgba(236, 72, 153, 0.40)', 'rgba(219, 39, 119, 0.10)', 'transparent']}
+        colors={['rgba(107, 191, 74, 0.05)', 'rgba(61, 153, 26, 0.02)', 'transparent']}
         style={[styles.blob, styles.blobCenterRight]}
       />
 
-      {/* Vibrant Mesh Blob 3 - Bottom Left Cyan Glowing Sphere */}
       <LinearGradient
-        colors={['rgba(6, 182, 212, 0.35)', 'rgba(59, 130, 246, 0.10)', 'transparent']}
+        colors={['rgba(61, 153, 26, 0.04)', 'transparent']}
         style={[styles.blob, styles.blobBottomLeft]}
       />
 
-      {/* Content Container */}
       <View style={styles.content}>{children}</View>
     </View>
   );
@@ -42,7 +38,7 @@ export default function VibrantBackground({ children }: { children?: React.React
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0814',
+    backgroundColor: UiColors.background,
     position: 'relative',
     overflow: 'hidden',
   },

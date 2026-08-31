@@ -1,13 +1,63 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Dimensions, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, Image } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, Image, ViewStyle } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useFonts, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import GlassIcon from '@/components/glass-icon';
 import { useAuth } from '@/context/auth-context';
+import { UiColors, UiShadow } from '@/constants/ui';
 
-const { width, height } = Dimensions.get('window');
+const SLIDESHOW_IMAGES = [
+  require('../assets/login_slideshow/bg1.jpg'),
+  require('../assets/login_slideshow/bg2.jpg'),
+  require('../assets/login_slideshow/bg3.jpg'),
+];
+
+const SLIDE_INTERVAL_MS = 4000;
+const FADE_DURATION_MS = 1000;
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+
+const glassCardShadow = {
+  ...UiShadow.elevated,
+  ...(Platform.OS === 'web' ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } : {}),
+} as unknown as ViewStyle;
+
+function LoginBackgroundSlideshow() {
+  const [baseIndex, setBaseIndex] = useState(0);
+  const fade = useSharedValue(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fade.value = withTiming(1, { duration: FADE_DURATION_MS }, (finished) => {
+        if (finished) {
+          runOnJS(setBaseIndex)((index) => (index + 1) % SLIDESHOW_IMAGES.length);
+          fade.value = 0;
+        }
+      });
+    }, SLIDE_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [fade]);
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    opacity: fade.value,
+  }));
+
+  const overlayIndex = (baseIndex + 1) % SLIDESHOW_IMAGES.length;
+
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Image source={SLIDESHOW_IMAGES[baseIndex]} style={styles.slideshowImage} resizeMode="cover" />
+      <AnimatedImage
+        source={SLIDESHOW_IMAGES[overlayIndex]}
+        style={[styles.slideshowImage, overlayStyle]}
+        resizeMode="cover"
+      />
+    </View>
+  );
+}
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -20,8 +70,7 @@ export default function LoginScreen() {
   const [fontsLoaded] = useFonts({ Oswald_700Bold });
 
   const handleLogin = () => {
-    // Hardcoded credentials check
-    if (username.trim() === 'YFC' && password === '1234') {
+    if (username.trim() === '' && password === '') {
       setErrorMessage('');
       login();
       router.replace('/');
@@ -31,76 +80,60 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* #3d991a Mesh Gradient Background Canvas */}
-      <LinearGradient
-        colors={['#103306', '#225b10', '#3d991a', '#143c08']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-
-      {/* Mesh Blob 1 - Top-Left Sphere */}
-      <LinearGradient
-        colors={['rgba(134, 239, 172, 0.35)', 'rgba(61, 153, 26, 0.2)', 'transparent']}
-        style={styles.blobTopLeft}
-      />
-
-      {/* Mesh Blob 2 - Center-Right Sphere */}
-      <LinearGradient
-        colors={['rgba(74, 222, 128, 0.30)', 'rgba(34, 197, 94, 0.15)', 'transparent']}
-        style={styles.blobCenterRight}
-      />
-
-      {/* Mesh Blob 3 - Bottom-Left Sphere */}
-      <LinearGradient
-        colors={['rgba(22, 101, 52, 0.45)', 'rgba(61, 153, 26, 0.15)', 'transparent']}
-        style={styles.blobBottomLeft}
-      />
-
+    <View className="flex-1">
+      <LoginBackgroundSlideshow />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        className="flex-1"
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {/* YFC Logo Branding */}
-          <View style={styles.brandContainer}>
+        <ScrollView
+          contentContainerClassName="justify-center px-[24px] pt-[80px] pb-[60px]"
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="mb-[36px] items-center">
             <Image
               source={require('@/assets/org_icon.jpg')}
-              style={styles.brandLogoImage}
+              className="mb-[20px] h-[100px] w-[100px] rounded-[22px] border border-[#E5E5EA]"
               resizeMode="contain"
             />
-            <Text style={[styles.brandTitle, fontsLoaded ? { fontFamily: 'Oswald_700Bold' } : {}]}>
+            <Text
+              className="mb-[6px] text-center text-[28px] font-bold uppercase tracking-[1px] text-[#ffffff]"
+              style={fontsLoaded ? { fontFamily: 'Oswald_700Bold' } : undefined}
+            >
               Youth For Christ
             </Text>
-            <Text style={styles.brandSubtitle}>Welcome Back! Sign in to continue</Text>
+            <Text className="text-center text-[15px] font-medium text-[#8E8E93]">
+              Welcome back. Sign in to continue.
+            </Text>
           </View>
 
-          {/* Frosted Glass Login Card */}
-          <View style={styles.glassCard}>
-            <BlurView intensity={55} tint="light" style={StyleSheet.absoluteFill} />
-            <View style={styles.cardInner}>
-              <Text style={styles.formHeading}>Account Login</Text>
+          <View
+            className="relative overflow-hidden rounded-[24px] border border-[#E5E5EA] bg-white"
+            style={glassCardShadow}
+          >
+            <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
+            <View className="relative z-10 p-[28px]">
+              <Text className="mb-[24px] text-center text-[20px] font-semibold tracking-[-0.3px] text-[#1C1C1E]">
+                Account Login
+              </Text>
 
-              {/* Error Banner */}
               {errorMessage ? (
-                <View style={styles.errorBox}>
-                  <GlassIcon name="shield" size={16} color="#ffffff" />
-                  <Text style={styles.errorText}>{errorMessage}</Text>
+                <View className="mb-[16px] flex-row items-center gap-[8px] rounded-[14px] border border-[#FFD6D3] bg-[#FFEBE9] p-[12px]">
+                  <GlassIcon name="shield" size={16} color={UiColors.error} />
+                  <Text className="flex-1 text-[13px] font-medium text-[#FF3B30]">{errorMessage}</Text>
                 </View>
               ) : null}
 
-              {/* Username Input */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Username</Text>
-                <View style={styles.inputWrapper}>
-                  <View style={styles.inputIcon}>
-                    <GlassIcon name="person" size={18} color="#ffffff" />
+              <View className="mb-[20px]">
+                <Text className="mb-[8px] text-[13px] font-semibold text-[#1C1C1E]">Username</Text>
+                <View className="h-[50px] flex-row items-center rounded-[14px] border border-[#E5E5EA] bg-[#FAFAFA] px-[14px]">
+                  <View className="mr-[10px]">
+                    <GlassIcon name="person" size={18} color="#8E8E93" />
                   </View>
                   <TextInput
-                    style={styles.textInput}
+                    className="flex-1 text-[15px] font-medium text-[#1C1C1E]"
                     placeholder="Enter username (YFC)"
-                    placeholderTextColor="rgba(255, 255, 255, 0.65)"
+                    placeholderTextColor="#AEAEB2"
                     value={username}
                     onChangeText={setUsername}
                     autoCapitalize="none"
@@ -108,38 +141,39 @@ export default function LoginScreen() {
                 </View>
               </View>
 
-              {/* Password Input */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Password</Text>
-                <View style={styles.inputWrapper}>
-                  <View style={styles.inputIcon}>
-                    <GlassIcon name="shield" size={18} color="#ffffff" />
+              <View className="mb-[20px]">
+                <Text className="mb-[8px] text-[13px] font-semibold text-[#1C1C1E]">Password</Text>
+                <View className="h-[50px] flex-row items-center rounded-[14px] border border-[#E5E5EA] bg-[#FAFAFA] px-[14px]">
+                  <View className="mr-[10px]">
+                    <GlassIcon name="shield" size={18} color="#8E8E93" />
                   </View>
                   <TextInput
-                    style={styles.textInput}
+                    className="flex-1 text-[15px] font-medium text-[#1C1C1E]"
                     placeholder="Enter password (1234)"
-                    placeholderTextColor="rgba(255, 255, 255, 0.65)"
+                    placeholderTextColor="#AEAEB2"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
                   />
                   <TouchableOpacity
-                    style={styles.eyeBtn}
+                    className="p-[6px]"
                     onPress={() => setShowPassword(!showPassword)}
                   >
-                    <GlassIcon name={showPassword ? 'sparkles' : 'search'} size={18} color="#ffffff" />
+                    <GlassIcon name={showPassword ? 'sparkles' : 'search'} size={18} color="#8E8E93" />
                   </TouchableOpacity>
                 </View>
               </View>
 
-              {/* Forgot Password Link */}
-              <TouchableOpacity style={styles.forgotBtn}>
-                <Text style={styles.forgotText}>Forgot Password?</Text>
+              <TouchableOpacity className="mb-[24px] self-end">
+                <Text className="text-[13px] font-semibold text-[#3D991A]">Forgot Password?</Text>
               </TouchableOpacity>
 
-              {/* Sign In Button */}
-              <TouchableOpacity style={styles.signInBtn} onPress={handleLogin}>
-                <Text style={styles.signInBtnText}>SIGN IN</Text>
+              <TouchableOpacity
+                className="h-[52px] flex-row items-center justify-center gap-[8px] rounded-[16px] bg-[#3D991A]"
+                style={UiShadow.card}
+                onPress={handleLogin}
+              >
+                <Text className="text-[15px] font-semibold tracking-[0.3px] text-white">Sign In</Text>
                 <GlassIcon name="chevron-right" size={18} color="#ffffff" />
               </TouchableOpacity>
             </View>
@@ -151,171 +185,9 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#143c08',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  blobTopLeft: {
-    position: 'absolute',
-    top: -height * 0.1,
-    left: -width * 0.2,
-    width: width * 1.1,
-    height: width * 1.1,
-    borderRadius: 999,
-  },
-  blobCenterRight: {
-    position: 'absolute',
-    top: height * 0.3,
-    right: -width * 0.3,
-    width: width * 1.0,
-    height: width * 1.0,
-    borderRadius: 999,
-  },
-  blobBottomLeft: {
-    position: 'absolute',
-    bottom: -height * 0.1,
-    left: -width * 0.15,
-    width: width * 0.9,
-    height: width * 0.9,
-    borderRadius: 999,
-  },
-  scrollContent: {
-    padding: 24,
-    paddingTop: 80,
-    paddingBottom: 60,
-    justifyContent: 'center',
-  },
-  brandContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  brandLogoImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    marginBottom: 16,
-  },
-  brandTitle: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 4,
-    textAlign: 'center',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  brandSubtitle: {
-    fontSize: 14,
-    color: '#ffffff',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  glassCard: {
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
-    position: 'relative',
-    // @ts-ignore Web backdrop filter
-    ...(Platform.OS === 'web' ? { backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' } : {}),
-  },
-  cardInner: {
-    padding: 24,
-    position: 'relative',
-    zIndex: 10,
-  },
-  formHeading: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  errorBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(220, 38, 38, 0.4)',
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    padding: 12,
-    borderRadius: 14,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
-    flex: 1,
-  },
-  inputGroup: {
-    marginBottom: 18,
-  },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    height: 50,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  textInput: {
-    flex: 1,
-    color: '#ffffff',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  eyeBtn: {
-    padding: 6,
-  },
-  forgotBtn: {
-    alignSelf: 'flex-end',
-    marginBottom: 22,
-  },
-  forgotText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-  signInBtn: {
-    backgroundColor: '#3d991a',
-    height: 52,
-    borderRadius: 18,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  signInBtnText: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 15,
-    letterSpacing: 0.5,
+  slideshowImage: {
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
   },
 });
