@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import VibrantBackground from '@/components/vibrant-background';
-import GlassCard from '@/components/glass-card';
 import GlassIcon from '@/components/glass-icon';
+
+const CARD = 'rounded-[20px] border border-[#E5E5EA] bg-white';
+const SECTION_TITLE = 'mb-[12px] text-[13px] font-semibold uppercase tracking-[0.5px] text-[#8E8E93]';
+const FILTER_BASE = 'mr-[10px] rounded-[20px] border px-[16px] py-[8px]';
+const FILTER_IDLE = `${FILTER_BASE} border-[#E5E5EA] bg-white`;
+const FILTER_ACTIVE = `${FILTER_BASE} border-[rgba(61,153,26,0.25)] bg-[#E8F5E3]`;
+const META_ROW = 'flex-row items-center gap-[8px]';
+const META_TEXT = 'flex-1 text-[13px] text-[#8E8E93]';
+
+const CATEGORIES = ['All', 'Worship', 'Conference', 'Outreach', 'Workshops'];
 
 const EVENTS = [
   {
@@ -40,12 +49,10 @@ const EVENTS = [
   },
 ];
 
-const FILTER_CHIP_BASE = 'mr-[10px] rounded-[20px] border px-[18px] py-[10px]';
-const FILTER_CHIP_IDLE = `${FILTER_CHIP_BASE} border-[#E5E5EA] bg-white`;
-const FILTER_CHIP_ACTIVE = `${FILTER_CHIP_BASE} border-[rgba(61,153,26,0.25)] bg-[#E8F5E3]`;
-
 export default function EventsScreen() {
   const [activeTab, setActiveTab] = useState('All');
+
+  const filtered = EVENTS.filter((e) => activeTab === 'All' || e.category === activeTab);
 
   return (
     <VibrantBackground>
@@ -53,25 +60,34 @@ export default function EventsScreen() {
         contentContainerClassName="px-[20px] pt-[60px] pb-[110px]"
         showsVerticalScrollIndicator={false}
       >
-        <View className="mb-[24px]">
-          <Text className="text-[32px] font-semibold tracking-[-0.5px] text-[#1C1C1E]">YFC Events</Text>
-          <Text className="mt-[6px] text-[15px] text-[#8E8E93]">
+        {/* Header */}
+        <View className="mb-[28px]">
+          <Text className="text-[28px] font-semibold tracking-[-0.5px] text-[#1C1C1E]">
+            YFC Events
+          </Text>
+          <Text className="mt-[4px] text-[15px] text-[#8E8E93]">
             Discover upcoming gatherings & worship nights
           </Text>
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-[24px]">
-          {['All', 'Worship', 'Conference', 'Outreach', 'Workshops'].map((cat) => (
+        {/* Category Filters */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mb-[20px] grow-0"
+          contentContainerClassName="pr-[20px]"
+        >
+          {CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat}
               onPress={() => setActiveTab(cat)}
-              className={activeTab === cat ? FILTER_CHIP_ACTIVE : FILTER_CHIP_IDLE}
+              className={activeTab === cat ? FILTER_ACTIVE : FILTER_IDLE}
             >
               <Text
                 className={
                   activeTab === cat
-                    ? 'text-[14px] font-semibold text-[#3D991A]'
-                    : 'text-[14px] font-medium text-[#8E8E93]'
+                    ? 'text-[13px] font-semibold text-[#3D991A]'
+                    : 'text-[13px] font-medium text-[#8E8E93]'
                 }
               >
                 {cat}
@@ -80,48 +96,55 @@ export default function EventsScreen() {
           ))}
         </ScrollView>
 
-        <View className="gap-[16px]">
-          {EVENTS.filter((e) => activeTab === 'All' || e.category === activeTab).map((event) => (
-            <GlassCard key={event.id} style={{ marginBottom: 4 }}>
-              <View className="mb-[12px] flex-row items-center justify-between">
-                <View className="rounded-[10px] border border-[rgba(61,153,26,0.2)] bg-[#E8F5E3] px-[12px] py-[4px]">
-                  <Text className="text-[12px] font-semibold text-[#3D991A]">{event.tag}</Text>
+        {/* Events List */}
+        <Text className={SECTION_TITLE}>{activeTab === 'All' ? 'All Events' : activeTab}</Text>
+        <View className="gap-[12px]">
+          {filtered.map((event) => (
+            <View key={event.id} className={`${CARD} px-[20px] py-[16px]`}>
+              <View className="mb-[10px] flex-row items-center justify-between gap-[8px]">
+                <View className="rounded-[10px] border border-[rgba(61,153,26,0.25)] bg-[#E8F5E3] px-[10px] py-[3px]">
+                  <Text className="text-[11px] font-semibold text-[#3D991A]">{event.tag}</Text>
                 </View>
-                <Text className="text-[13px] font-medium text-[#8E8E93]">{event.category}</Text>
+                <Text className="text-[12px] text-[#8E8E93]">{event.category}</Text>
               </View>
 
-              <Text className="mb-[8px] text-[20px] font-semibold tracking-[-0.3px] text-[#1C1C1E]">{event.title}</Text>
-              <Text className="mb-[16px] text-[14px] leading-[22px] text-[#8E8E93]">
+              <Text className="mb-[6px] text-[16px] font-semibold tracking-[-0.3px] text-[#1C1C1E]">
+                {event.title}
+              </Text>
+              <Text className="mb-[12px] text-[14px] leading-[20px] text-[#8E8E93]">
                 {event.description}
               </Text>
 
-              <View className="mb-[6px] flex-row items-center gap-[8px]">
-                <GlassIcon name="calendar" size={15} color="#3D991A" />
-                <Text className="text-[13px] font-medium text-[#1C1C1E]">{event.date}</Text>
+              <View className={`${META_ROW} mb-[4px]`}>
+                <GlassIcon name="calendar" size={13} color="#3D991A" />
+                <Text className={META_TEXT}>{event.date}</Text>
+              </View>
+              <View className={`${META_ROW} mb-[4px]`}>
+                <GlassIcon name="clock" size={13} color="#8E8E93" />
+                <Text className={META_TEXT}>{event.time}</Text>
+              </View>
+              <View className={META_ROW}>
+                <GlassIcon name="location" size={13} color="#8E8E93" />
+                <Text className={META_TEXT}>{event.location}</Text>
               </View>
 
-              <View className="mb-[6px] flex-row items-center gap-[8px]">
-                <GlassIcon name="clock" size={15} color="#8E8E93" />
-                <Text className="text-[13px] font-medium text-[#8E8E93]">{event.time}</Text>
-              </View>
-
-              <View className="mb-[6px] flex-row items-center gap-[8px]">
-                <GlassIcon name="location" size={15} color="#8E8E93" />
-                <Text className="text-[13px] font-medium text-[#8E8E93]">{event.location}</Text>
-              </View>
-
-              <View className="mt-[16px] flex-row items-center justify-between border-t border-t-[#F0F0F0] pt-[14px]">
-                <View className="flex-row items-center gap-[6px]">
+              <View className="mt-[14px] flex-row items-center justify-between gap-[12px] border-t border-t-[#F0F0F0] pt-[12px]">
+                <View className="flex-1 flex-row items-center gap-[6px]">
                   <GlassIcon name="people" size={14} color="#8E8E93" />
-                  <Text className="text-[13px] text-[#8E8E93]">{event.attendees} Going</Text>
+                  <Text className="text-[12px] text-[#8E8E93]">{event.attendees} Going</Text>
                 </View>
-
-                <TouchableOpacity className="rounded-[14px] bg-[#3D991A] px-[18px] py-[10px]">
+                <TouchableOpacity className="rounded-[16px] bg-[#3D991A] px-[16px] py-[10px]">
                   <Text className="text-[13px] font-semibold text-white">Register Now</Text>
                 </TouchableOpacity>
               </View>
-            </GlassCard>
+            </View>
           ))}
+
+          {filtered.length === 0 && (
+            <View className={`${CARD} items-center px-[20px] py-[28px]`}>
+              <Text className="text-[14px] text-[#8E8E93]">No events in this category yet.</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </VibrantBackground>
