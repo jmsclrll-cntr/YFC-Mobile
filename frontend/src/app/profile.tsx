@@ -11,11 +11,11 @@ const MENU_ITEM = 'flex-row items-center px-[16px] py-[14px]';
 const MENU_ITEM_DIVIDED = `${MENU_ITEM} border-b border-b-[#F0F0F0]`;
 const ICON_WRAP = 'mr-[12px] h-[36px] w-[36px] items-center justify-center rounded-[18px] bg-[#F5F5F5]';
 
-const MENU_ITEMS: { icon: IconName; label: string }[] = [
-  { icon: 'person', label: 'Personal Information' },
-  { icon: 'calendar', label: 'My Registered Events' },
-  { icon: 'heart', label: 'Saved Prayer Intentions' },
-  { icon: 'settings', label: 'App Preferences & Notifications' },
+const MENU_ITEMS: { icon: IconName; label: string; route: string }[] = [
+  { icon: 'person', label: 'Personal Information', route: '/profile_section/personal-information' },
+  { icon: 'calendar', label: 'My Registered Events', route: '/profile_section/registered-events' },
+  { icon: 'heart', label: 'Saved Prayer Intentions', route: '/profile_section/saved-prayer-intentions' },
+  { icon: 'settings', label: 'App Preferences & Notifications', route: '/profile_section/app-preferences' },
 ];
 
 const STATS = [
@@ -81,7 +81,7 @@ export default function ProfileScreen() {
         <Text className={SECTION_TITLE}>Account & Settings</Text>
         <View className={`${CARD} mb-[4px] overflow-hidden`}>
           {MENU_ITEMS.map((item, idx) => (
-            <TouchableOpacity key={idx} className={MENU_ITEM_DIVIDED}>
+            <TouchableOpacity key={idx} className={MENU_ITEM_DIVIDED} onPress={() => router.push(item.route as any)}>
               <View className={ICON_WRAP}>
                 <GlassIcon name={item.icon} size={18} color={idx === 0 ? '#3D991A' : '#8E8E93'} />
               </View>

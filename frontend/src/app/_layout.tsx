@@ -8,6 +8,7 @@ import { UiColors } from '@/constants/ui';
 function TabLayoutInner() {
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
+  const hideTabBar = isLoginPage || pathname.startsWith('/profile_section');
 
   return (
     <Tabs
@@ -17,7 +18,7 @@ function TabLayoutInner() {
         tabBarActiveTintColor: UiColors.accent,
         tabBarInactiveTintColor: UiColors.textSecondary,
         tabBarLabelStyle: styles.labelStyle,
-        tabBarStyle: isLoginPage ? { display: 'none' } : styles.tabBar,
+        tabBarStyle: hideTabBar ? { display: 'none' } : styles.tabBar,
         tabBarBackground: () => <View style={styles.tabBarBackground} />,
       }}
     >
@@ -49,19 +50,7 @@ function TabLayoutInner() {
           tabBarIcon: ({ color }) => <GlassIcon name="person" size={22} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="login"
-        options={{
-          href: null,
-          tabBarStyle: { display: 'none' },
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          href: null,
-        }}
-      />
+
       <Tabs.Screen
         name="announcements"
         options={{
@@ -76,6 +65,24 @@ function TabLayoutInner() {
       />
       <Tabs.Screen
         name="attendance"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="profile_section"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="login"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
         options={{
           href: null,
         }}
