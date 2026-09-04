@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Redirect, useRouter } from 'expo-router';
+import { Redirect, useRouter, useLocalSearchParams } from 'expo-router';
 import GlassIcon from '@/components/glass-icon';
 import VibrantBackground from '@/components/vibrant-background';
 import { useAuth } from '@/context/auth-context';
+import { supabase } from '@/lib/supabase';
 
 import { DashboardTab } from '@/components/dashboard/DashboardTab';
 import { AreaTab } from '@/components/dashboard/AreaTab';
@@ -26,8 +27,36 @@ const TAB_CHIP_ACTIVE = `${TAB_CHIP} border-[rgba(61,153,26,0.25)] bg-[#E8F5E3]`
 
 export default function DashboardScreen() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const params = useLocalSearchParams<{ username?: string }>();
+  const { isAuthenticated, username } = useAuth();
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [memberProfile, setMemberProfile] = useState<{ firstname?: string } | null>(null);
+
+  const currentUsername = username || params.username;
+
+  useEffect(() => {
+    async function fetchMemberProfile() {
+      if (!currentUsername) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('yfc_members')
+          .select('*')
+          .eq('username', currentUsername)
+          .single();
+
+        if (!error && data) {
+          setMemberProfile(data);
+        }
+      } catch (err) {
+        if (__DEV__) {
+          console.error('Failed to fetch member profile:', err);
+        }
+      }
+    }
+
+    fetchMemberProfile();
+  }, [currentUsername]);
 
   if (!isAuthenticated) {
     return <Redirect href="/login" />;
@@ -45,7 +74,9 @@ export default function DashboardScreen() {
             </View>
             <View>
               <Text className="text-[13px] font-medium text-[#8E8E93]">Welcome back</Text>
-              <Text className="text-[20px] font-semibold tracking-[-0.3px] text-[#1C1C1E]">Youth Servant</Text>
+              <Text className="text-[20px] font-semibold tracking-[-0.3px] text-[#1C1C1E]">
+                {memberProfile?.firstname || 'Youth Servant'}
+              </Text>
             </View>
           </View>
 

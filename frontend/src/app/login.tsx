@@ -97,8 +97,8 @@ export default function LoginScreen() {
       }
 
       if (data === true) {
-        login();
-        router.replace('/');
+        login(trimmedUsername);
+        router.replace({ pathname: '/', params: { username: trimmedUsername } });
         return;
       }
 
